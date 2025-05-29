@@ -52,7 +52,7 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
   const yearlyGoal = 50000;
   const monthlyProgress = Math.min((totalPnL / monthlyGoal) * 100, 100);
 
-  const accentClass = accentColor === 'mint' ? 'bg-gradient-mint' : 'bg-gradient-to-r from-purple-600 to-purple-700';
+  const accentClass = accentColor === 'mint' ? 'bg-gradient-mint shadow-mint-500/25' : 'bg-gradient-to-r from-purple-600 to-purple-700 shadow-purple-500/25';
   const hoverClass = accentColor === 'mint' ? 'hover:shadow-mint-500/25' : 'hover:shadow-purple-500/25';
 
   useEffect(() => {
@@ -111,51 +111,52 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
   };
 
   return (
-    <div className="ml-64 p-8 min-h-screen">
+    <div className="ml-0 lg:ml-64 p-4 lg:p-8 min-h-screen pt-16 lg:pt-8">
       {/* Enhanced Header */}
-      <div ref={headerRef} className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
+      <div ref={headerRef} className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+        <div className="flex items-center mb-4 lg:mb-0">
           <div className="relative">
-            <TrendingUp className={`h-10 w-10 mr-4 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+            <TrendingUp className={`h-8 lg:h-10 w-8 lg:w-10 mr-4 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'} glow-effect`} />
             <div className={`absolute inset-0 ${accentColor === 'mint' ? 'bg-trading-mint/30' : 'bg-purple-400/30'} rounded-full blur-lg`}></div>
           </div>
           <div>
-            <h1 className="text-4xl font-bold text-white">Elite Trading Dashboard</h1>
-            <p className="text-gray-400 mt-1">Professional portfolio management</p>
+            <h1 className="text-2xl lg:text-4xl font-bold text-white glow-text">Elite Trading Dashboard</h1>
+            <p className="text-gray-400 mt-1 text-sm lg:text-base">Professional portfolio management</p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" className={`${accentColor === 'mint' ? 'border-trading-mint/30' : 'border-purple-500/30'} text-white ${accentColor === 'mint' ? 'hover:bg-trading-mint/20' : 'hover:bg-purple-500/20'}`}>
-            <Bell className="h-4 w-4 mr-2" />
+        <div className="flex flex-wrap items-center gap-2 lg:gap-4">
+          <Button variant="outline" className={`${accentColor === 'mint' ? 'border-trading-mint/30 hover:bg-trading-mint/20' : 'border-purple-500/30 hover:bg-purple-500/20'} text-white text-xs lg:text-sm`}>
+            <Bell className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" />
             Alerts
           </Button>
-          <Button variant="outline" className={`${accentColor === 'mint' ? 'border-trading-mint/30' : 'border-purple-500/30'} text-white ${accentColor === 'mint' ? 'hover:bg-trading-mint/20' : 'hover:bg-purple-500/20'}`}>
-            <Download className="h-4 w-4 mr-2" />
+          <Button variant="outline" className={`${accentColor === 'mint' ? 'border-trading-mint/30 hover:bg-trading-mint/20' : 'border-purple-500/30 hover:bg-purple-500/20'} text-white text-xs lg:text-sm`}>
+            <Download className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" />
             Export
           </Button>
           <Button 
             onClick={() => setShowAddForm(true)}
-            className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg ${hoverClass}`}
+            className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg glow-effect text-xs lg:text-sm`}
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
             Add Trade
           </Button>
         </div>
       </div>
 
       {/* Enhanced Stats Cards */}
-      <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-6 mb-8">
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
-              <DollarSign className={`h-4 w-4 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
-              Total PnL
+      <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 lg:gap-6 mb-8">
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <DollarSign className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              <span className="hidden sm:inline">Total PnL</span>
+              <span className="sm:hidden">PnL</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className={`text-3xl font-bold ${totalPnL >= 0 ? 'profit-glow' : 'loss-glow'}`}>
-              ${totalPnL.toFixed(2)}
+          <CardContent className="pt-0">
+            <div className={`text-lg lg:text-3xl font-bold glow-text ${totalPnL >= 0 ? 'text-trading-mint' : 'text-red-400'}`}>
+              ${totalPnL.toFixed(0)}
             </div>
             <div className="text-xs text-gray-400 mt-1">
               {totalTrades} trades
@@ -163,15 +164,15 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
-              <Target className={`h-4 w-4 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <Target className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
               Win Rate
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
+          <CardContent className="pt-0">
+            <div className="text-lg lg:text-3xl font-bold text-white glow-text">
               {winRate.toFixed(1)}%
             </div>
             <div className="text-xs text-gray-400 mt-1">
@@ -180,59 +181,68 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300">Average Trade</CardTitle>
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">
+              <span className="hidden lg:inline">Average Trade</span>
+              <span className="lg:hidden">Avg Trade</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${avgTrade >= 0 ? 'profit-glow' : 'loss-glow'}`}>
-              ${avgTrade.toFixed(2)}
+          <CardContent className="pt-0">
+            <div className={`text-lg lg:text-2xl font-bold glow-text ${avgTrade >= 0 ? 'text-trading-mint' : 'text-red-400'}`}>
+              ${avgTrade.toFixed(0)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300">Max Win</CardTitle>
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">Max Win</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold profit-glow">
-              ${maxWin.toFixed(2)}
+          <CardContent className="pt-0">
+            <div className="text-lg lg:text-2xl font-bold text-trading-mint glow-text">
+              ${maxWin.toFixed(0)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300">Max Loss</CardTitle>
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">Max Loss</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold loss-glow">
-              ${maxLoss.toFixed(2)}
+          <CardContent className="pt-0">
+            <div className="text-lg lg:text-2xl font-bold text-red-400 glow-text">
+              ${Math.abs(maxLoss).toFixed(0)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300">Profit Factor</CardTitle>
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">
+              <span className="hidden lg:inline">Profit Factor</span>
+              <span className="lg:hidden">P.Factor</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
+          <CardContent className="pt-0">
+            <div className="text-lg lg:text-2xl font-bold text-white glow-text">
               {profitFactor.toFixed(2)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-300">Monthly Goal</CardTitle>
+        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover col-span-2 md:col-span-1">
+          <CardHeader className="pb-2 lg:pb-3">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">
+              <span className="hidden lg:inline">Monthly Goal</span>
+              <span className="lg:hidden">Goal</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-lg font-bold text-white mb-2">
+          <CardContent className="pt-0">
+            <div className="text-sm lg:text-lg font-bold text-white mb-2 glow-text">
               ${totalPnL.toFixed(0)} / ${monthlyGoal}
             </div>
-            <Progress value={monthlyProgress} className="h-2" />
+            <Progress value={monthlyProgress} className="h-1 lg:h-2" />
             <div className={`text-xs mt-1 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`}>
               {monthlyProgress.toFixed(1)}%
             </div>
@@ -242,14 +252,14 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
 
       {/* Recent Trades */}
       <div ref={contentRef}>
-        <Card className="trading-card">
+        <Card className="trading-card border-trading-mint/30 hover:border-trading-mint/50 transition-all duration-300 glow-hover">
           <CardHeader>
-            <CardTitle className="text-white">Recent Trades</CardTitle>
+            <CardTitle className="text-white glow-text">Recent Trades</CardTitle>
           </CardHeader>
           <CardContent>
             {trades.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-4xl mb-4">📊</div>
+              <div className="text-center py-8 lg:py-12">
+                <div className="text-3xl lg:text-4xl mb-4">📊</div>
                 <div className="text-lg text-gray-300">No trades yet</div>
                 <div className="text-sm text-gray-400 mt-2">Add your first trade to get started</div>
               </div>
@@ -258,17 +268,17 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
                 {trades.slice(-5).reverse().map((trade) => (
                   <div
                     key={trade.id}
-                    className="p-4 rounded-xl border border-trading-mint/30 bg-trading-blue/40 cursor-pointer hover:bg-trading-mint/10 hover:border-trading-mint/50 transition-all duration-300"
+                    className="p-3 lg:p-4 rounded-xl border border-trading-mint/30 bg-trading-blue/40 cursor-pointer hover:bg-trading-mint/10 hover:border-trading-mint/50 transition-all duration-300 hover:scale-102 hover:shadow-lg glow-hover"
                     onClick={() => setSelectedTrade(trade)}
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="font-bold text-white">{trade.symbol}</div>
-                        <div className="text-sm text-gray-300">
+                        <div className="font-bold text-white glow-text">{trade.symbol}</div>
+                        <div className="text-xs lg:text-sm text-gray-300">
                           {trade.type.toUpperCase()} {trade.quantity} @ ${trade.entryPrice}
                         </div>
                       </div>
-                      <div className={`text-lg font-bold ${trade.pnl >= 0 ? 'profit-glow' : 'loss-glow'}`}>
+                      <div className={`text-sm lg:text-lg font-bold glow-text ${trade.pnl >= 0 ? 'text-trading-mint' : 'text-red-400'}`}>
                         ${trade.pnl.toFixed(2)}
                       </div>
                     </div>
