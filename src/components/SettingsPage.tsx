@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,11 +72,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ accentColor, onAccentColorC
                     'border-purple-500/30 text-white hover:bg-purple-500/20'
                   }
                 >
-                  Dark Purple
+                  Dark Purple (Recommended)
                 </Button>
               </div>
               <p className="text-gray-400 text-sm">
-                Choose your preferred accent color. The change will apply immediately across the platform.
+                Choose your preferred accent color. Purple theme provides a more professional trading experience.
               </p>
             </div>
 

@@ -10,7 +10,9 @@ import {
   Settings, 
   PieChart,
   TrendingUp,
-  Shield
+  Shield,
+  Newspaper,
+  Activity
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -25,6 +27,8 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+    { id: 'market', label: 'Market Overview', icon: Activity },
+    { id: 'news', label: 'Market News', icon: Newspaper },
     { id: 'journal', label: 'Journal', icon: BookOpen },
     { id: 'risk', label: 'Risk Management', icon: Shield },
     { id: 'goals', label: 'Goals & Targets', icon: Target },
@@ -35,7 +39,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
   const hoverClass = accentColor === 'mint' ? 'hover:border-trading-mint/50' : 'hover:border-purple-500/50';
 
   return (
-    <nav className="w-64 h-screen bg-trading-dark-blue border-r border-trading-mint/20 p-4 fixed left-0 top-0 z-40">
+    <nav className="w-64 h-screen bg-trading-dark-blue border-r border-purple-500/20 p-4 fixed left-0 top-0 z-40">
       <div className="flex items-center mb-8">
         <TrendingUp className={`h-8 w-8 mr-3 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
         <h2 className="text-xl font-bold text-white">TradePro</h2>

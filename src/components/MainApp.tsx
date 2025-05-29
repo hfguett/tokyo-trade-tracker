@@ -6,12 +6,16 @@ import TradeCalendar from './TradeCalendar';
 import AnalyticsPage from './AnalyticsPage';
 import PortfolioPage from './PortfolioPage';
 import SettingsPage from './SettingsPage';
+import TradeDetailsModal from './TradeDetailsModal';
+import MarketOverview from './MarketOverview';
+import TradingNews from './TradingNews';
 import { Trade } from './TradingDashboard';
 
 const MainApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [accentColor, setAccentColor] = useState<'mint' | 'purple'>('mint');
+  const [accentColor, setAccentColor] = useState<'mint' | 'purple'>('purple');
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);
@@ -19,6 +23,19 @@ const MainApp: React.FC = () => {
 
   const handleAccentColorChange = (color: 'mint' | 'purple') => {
     setAccentColor(color);
+  };
+
+  const handleTradeClick = (trade: Trade) => {
+    setSelectedTrade(trade);
+  };
+
+  const handleUpdateTrade = (updatedTrade: Trade) => {
+    setTrades(prev => 
+      prev.map(trade => 
+        trade.id === updatedTrade.id ? updatedTrade : trade
+      )
+    );
+    setSelectedTrade(null);
   };
 
   const renderCurrentPage = () => {
@@ -32,13 +49,17 @@ const MainApp: React.FC = () => {
               <h1 className="text-4xl font-bold text-white mb-2">Trading Calendar</h1>
               <p className="text-gray-400">View and manage your trades by date</p>
             </div>
-            <TradeCalendar trades={trades} onTradeClick={() => {}} />
+            <TradeCalendar trades={trades} onTradeClick={handleTradeClick} />
           </div>
         );
       case 'analytics':
         return <AnalyticsPage trades={trades} accentColor={accentColor} />;
       case 'portfolio':
         return <PortfolioPage trades={trades} accentColor={accentColor} />;
+      case 'market':
+        return <MarketOverview accentColor={accentColor} />;
+      case 'news':
+        return <TradingNews accentColor={accentColor} />;
       case 'journal':
         return (
           <div className="ml-64 p-8 min-h-screen trading-gradient">
@@ -93,6 +114,14 @@ const MainApp: React.FC = () => {
         accentColor={accentColor}
       />
       {renderCurrentPage()}
+      
+      {selectedTrade && (
+        <TradeDetailsModal
+          trade={selectedTrade}
+          onClose={() => setSelectedTrade(null)}
+          onUpdate={handleUpdateTrade}
+        />
+      )}
     </div>
   );
 };

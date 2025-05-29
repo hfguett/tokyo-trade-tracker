@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, Edit2, Save } from 'lucide-react';
-import { format } from 'date-fns';
+import { X, Edit2, Save, Cancel } from 'lucide-react';
 import { Trade } from './TradingDashboard';
 
 interface TradeDetailsModalProps {
@@ -18,179 +17,147 @@ interface TradeDetailsModalProps {
 
 const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedTrade, setEditedTrade] = useState(trade);
+  const [editData, setEditData] = useState({
+    exitPrice: trade.exitPrice?.toString() || '',
+    remarks: trade.remarks || '',
+    status: trade.status
+  });
 
   const handleSave = () => {
-    onUpdate(editedTrade);
-    setIsEditing(false);
-  };
+    const exitPrice = editData.exitPrice ? parseFloat(editData.exitPrice) : undefined;
+    let pnl = trade.pnl;
+    
+    if (exitPrice) {
+      pnl = trade.type === 'buy' 
+        ? (exitPrice - trade.entryPrice) * trade.quantity
+        : (trade.entryPrice - exitPrice) * trade.quantity;
+    }
 
-  const handleCancel = () => {
-    setEditedTrade(trade);
+    const updatedTrade: Trade = {
+      ...trade,
+      exitPrice,
+      pnl,
+      remarks: editData.remarks,
+      status: editData.status as 'open' | 'closed'
+    };
+
+    onUpdate(updatedTrade);
     setIsEditing(false);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-lg trading-card border-trading-mint/30">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-md trading-card">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-white">{trade.symbol} Trade Details</CardTitle>
-              <p className="text-gray-300 text-sm mt-1">
-                {format(trade.date, 'EEEE, MMMM dd, yyyy')}
-              </p>
-            </div>
+            <CardTitle className="text-white flex items-center">
+              {trade.symbol} Trade Details
+              <Badge className={`ml-2 ${trade.pnl >= 0 ? 'bg-purple-600' : 'bg-red-600'}`}>
+                ${trade.pnl.toFixed(2)}
+              </Badge>
+            </CardTitle>
             <div className="flex space-x-2">
               {!isEditing && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                  className="text-trading-mint hover:text-white"
-                >
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
                   <Edit2 className="h-4 w-4" />
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="text-gray-400 hover:text-white"
-              >
+              <Button variant="ghost" size="sm" onClick={onClose}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!isEditing ? (
-            // View Mode
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-gray-300">Type</Label>
-                  <div className="text-white font-medium capitalize">{trade.type}</div>
-                </div>
-                <div>
-                  <Label className="text-gray-300">Status</Label>
-                  <Badge variant={trade.status === 'open' ? 'outline' : 'default'} className="ml-2">
-                    {trade.status}
-                  </Badge>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-gray-300">Type</Label>
+              <div className="text-white font-medium">{trade.type.toUpperCase()}</div>
+            </div>
+            <div>
+              <Label className="text-gray-300">Quantity</Label>
+              <div className="text-white font-medium">{trade.quantity}</div>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-gray-300">Quantity</Label>
-                  <div className="text-white font-medium">{trade.quantity}</div>
-                </div>
-                <div>
-                  <Label className="text-gray-300">Entry Price</Label>
-                  <div className="text-white font-medium">${trade.entryPrice.toFixed(2)}</div>
-                </div>
-              </div>
-
-              {trade.exitPrice && (
-                <div>
-                  <Label className="text-gray-300">Exit Price</Label>
-                  <div className="text-white font-medium">${trade.exitPrice.toFixed(2)}</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-gray-300">Entry Price</Label>
+              <div className="text-white font-medium">${trade.entryPrice}</div>
+            </div>
+            <div>
+              <Label className="text-gray-300">Exit Price</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={editData.exitPrice}
+                  onChange={(e) => setEditData(prev => ({ ...prev, exitPrice: e.target.value }))}
+                  className="border-purple-500/30 bg-trading-blue/50 text-white"
+                  placeholder="Enter exit price"
+                />
+              ) : (
+                <div className="text-white font-medium">
+                  {trade.exitPrice ? `$${trade.exitPrice}` : 'Not set'}
                 </div>
               )}
+            </div>
+          </div>
 
-              <div>
-                <Label className="text-gray-300">PnL</Label>
-                <div className={`text-xl font-bold ${trade.pnl >= 0 ? 'text-trading-profit' : 'text-trading-loss'}`}>
-                  ${trade.pnl.toFixed(2)}
-                </div>
+          <div>
+            <Label className="text-gray-300">Date</Label>
+            <div className="text-white font-medium">{trade.date.toLocaleDateString()}</div>
+          </div>
+
+          <div>
+            <Label className="text-gray-300">Status</Label>
+            {isEditing ? (
+              <select 
+                value={editData.status}
+                onChange={(e) => setEditData(prev => ({ ...prev, status: e.target.value as 'open' | 'closed' }))}
+                className="w-full p-2 rounded-md border border-purple-500/30 bg-trading-blue/50 text-white"
+              >
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+              </select>
+            ) : (
+              <Badge variant={trade.status === 'closed' ? 'default' : 'secondary'}>
+                {trade.status}
+              </Badge>
+            )}
+          </div>
+
+          <div>
+            <Label className="text-gray-300">Remarks</Label>
+            {isEditing ? (
+              <Textarea
+                value={editData.remarks}
+                onChange={(e) => setEditData(prev => ({ ...prev, remarks: e.target.value }))}
+                className="border-purple-500/30 bg-trading-blue/50 text-white"
+                placeholder="Add your trading notes..."
+              />
+            ) : (
+              <div className="text-white bg-trading-blue/30 p-3 rounded-md min-h-[80px]">
+                {trade.remarks || 'No remarks added'}
               </div>
+            )}
+          </div>
 
-              {trade.remarks && (
-                <div>
-                  <Label className="text-gray-300">Remarks</Label>
-                  <div className="text-white bg-trading-blue/30 p-3 rounded-lg border border-trading-mint/20 mt-2">
-                    {trade.remarks}
-                  </div>
-                </div>
-              )}
-            </>
+          {isEditing ? (
+            <div className="flex space-x-4 pt-4">
+              <Button onClick={handleSave} className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700">
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 border-purple-500/30 text-white">
+                <Cancel className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+            </div>
           ) : (
-            // Edit Mode
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-white">Quantity</Label>
-                  <Input
-                    type="number"
-                    value={editedTrade.quantity}
-                    onChange={(e) => setEditedTrade(prev => ({ ...prev, quantity: parseFloat(e.target.value) }))}
-                    className="border-trading-mint/30 bg-trading-blue/50 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-white">Entry Price</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={editedTrade.entryPrice}
-                    onChange={(e) => setEditedTrade(prev => ({ ...prev, entryPrice: parseFloat(e.target.value) }))}
-                    className="border-trading-mint/30 bg-trading-blue/50 text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white">Exit Price</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editedTrade.exitPrice || ''}
-                  onChange={(e) => setEditedTrade(prev => ({ 
-                    ...prev, 
-                    exitPrice: e.target.value ? parseFloat(e.target.value) : undefined 
-                  }))}
-                  className="border-trading-mint/30 bg-trading-blue/50 text-white"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white">PnL ($)</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editedTrade.pnl}
-                  onChange={(e) => setEditedTrade(prev => ({ ...prev, pnl: parseFloat(e.target.value) }))}
-                  className="border-trading-mint/30 bg-trading-blue/50 text-white"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white">Remarks</Label>
-                <Textarea
-                  value={editedTrade.remarks || ''}
-                  onChange={(e) => setEditedTrade(prev => ({ ...prev, remarks: e.target.value }))}
-                  className="border-trading-mint/30 bg-trading-blue/50 text-white min-h-20"
-                  placeholder="Add trade notes..."
-                />
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="flex-1 border-trading-mint/30 text-white hover:bg-trading-mint/20"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  className="flex-1 bg-gradient-mint hover:scale-105 transform transition-all duration-300"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-              </div>
-            </>
+            <Button onClick={onClose} className="w-full bg-gradient-to-r from-purple-600 to-purple-700">
+              Close
+            </Button>
           )}
         </CardContent>
       </Card>

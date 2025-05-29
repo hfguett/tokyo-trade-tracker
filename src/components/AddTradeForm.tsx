@@ -1,17 +1,13 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, X } from 'lucide-react';
-import { format } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
+import { X } from 'lucide-react';
 import { Trade } from './TradingDashboard';
-import { cn } from '@/lib/utils';
 
 interface AddTradeFormProps {
   onSubmit: (trade: Omit<Trade, 'id'>) => void;
@@ -20,28 +16,38 @@ interface AddTradeFormProps {
 
 const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    date: new Date(),
     symbol: '',
     type: 'buy' as 'buy' | 'sell',
     quantity: '',
     entryPrice: '',
     exitPrice: '',
-    pnl: '',
+    date: new Date().toISOString().split('T')[0],
     remarks: '',
-    status: 'closed' as 'open' | 'closed'
+    status: 'open' as 'open' | 'closed'
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const entryPrice = parseFloat(formData.entryPrice);
+    const exitPrice = formData.exitPrice ? parseFloat(formData.exitPrice) : undefined;
+    const quantity = parseInt(formData.quantity);
+    
+    let pnl = 0;
+    if (exitPrice) {
+      pnl = formData.type === 'buy' 
+        ? (exitPrice - entryPrice) * quantity
+        : (entryPrice - exitPrice) * quantity;
+    }
+
     const trade: Omit<Trade, 'id'> = {
-      date: formData.date,
       symbol: formData.symbol.toUpperCase(),
       type: formData.type,
-      quantity: parseFloat(formData.quantity),
-      entryPrice: parseFloat(formData.entryPrice),
-      exitPrice: formData.exitPrice ? parseFloat(formData.exitPrice) : undefined,
-      pnl: parseFloat(formData.pnl),
+      quantity,
+      entryPrice,
+      exitPrice,
+      date: new Date(formData.date),
+      pnl,
       remarks: formData.remarks,
       status: formData.status
     };
@@ -49,177 +55,118 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
     onSubmit(trade);
   };
 
-  const handleInputChange = (field: string, value: string | Date) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md trading-card border-trading-mint/30">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-md trading-card">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-white">Add New Trade</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onCancel}
-              className="text-gray-400 hover:text-white"
-            >
+            <Button variant="ghost" size="sm" onClick={onCancel}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Date Picker */}
-            <div className="space-y-2">
-              <Label className="text-white">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal border-trading-mint/30 bg-trading-blue/50 text-white",
-                      !formData.date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.date}
-                    onSelect={(date) => date && handleInputChange('date', date)}
-                    initialFocus
-                    className="bg-trading-blue border-trading-mint/30 text-white p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Symbol */}
-            <div className="space-y-2">
+            <div>
               <Label className="text-white">Symbol</Label>
               <Input
                 value={formData.symbol}
-                onChange={(e) => handleInputChange('symbol', e.target.value)}
-                placeholder="e.g., AAPL, TSLA"
-                className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400"
+                onChange={(e) => setFormData(prev => ({ ...prev, symbol: e.target.value }))}
+                placeholder="AAPL, TSLA, etc."
+                className="border-purple-500/30 bg-trading-blue/50 text-white"
                 required
               />
             </div>
 
-            {/* Type and Status */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-white">Type</Label>
-                <Select value={formData.type} onValueChange={(value: 'buy' | 'sell') => handleInputChange('type', value)}>
-                  <SelectTrigger className="border-trading-mint/30 bg-trading-blue/50 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-trading-blue border-trading-mint/30">
-                    <SelectItem value="buy" className="text-white">Buy</SelectItem>
-                    <SelectItem value="sell" className="text-white">Sell</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white">Status</Label>
-                <Select value={formData.status} onValueChange={(value: 'open' | 'closed') => handleInputChange('status', value)}>
-                  <SelectTrigger className="border-trading-mint/30 bg-trading-blue/50 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-trading-blue border-trading-mint/30">
-                    <SelectItem value="open" className="text-white">Open</SelectItem>
-                    <SelectItem value="closed" className="text-white">Closed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Quantity and Prices */}
-            <div className="space-y-2">
-              <Label className="text-white">Quantity</Label>
-              <Input
-                type="number"
-                value={formData.quantity}
-                onChange={(e) => handleInputChange('quantity', e.target.value)}
-                placeholder="100"
-                className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400"
-                required
-              />
+            <div>
+              <Label className="text-white">Type</Label>
+              <Select value={formData.type} onValueChange={(value: 'buy' | 'sell') => setFormData(prev => ({ ...prev, type: value }))}>
+                <SelectTrigger className="border-purple-500/30 bg-trading-blue/50 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="buy">Buy</SelectItem>
+                  <SelectItem value="sell">Sell</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div>
+                <Label className="text-white">Quantity</Label>
+                <Input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                  className="border-purple-500/30 bg-trading-blue/50 text-white"
+                  required
+                />
+              </div>
+              <div>
                 <Label className="text-white">Entry Price</Label>
                 <Input
                   type="number"
                   step="0.01"
                   value={formData.entryPrice}
-                  onChange={(e) => handleInputChange('entryPrice', e.target.value)}
-                  placeholder="150.00"
-                  className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400"
+                  onChange={(e) => setFormData(prev => ({ ...prev, entryPrice: e.target.value }))}
+                  className="border-purple-500/30 bg-trading-blue/50 text-white"
                   required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-white">Exit Price</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={formData.exitPrice}
-                  onChange={(e) => handleInputChange('exitPrice', e.target.value)}
-                  placeholder="155.00"
-                  className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400"
                 />
               </div>
             </div>
 
-            {/* PnL */}
-            <div className="space-y-2">
-              <Label className="text-white">PnL ($)</Label>
+            <div>
+              <Label className="text-white">Exit Price (Optional)</Label>
               <Input
                 type="number"
                 step="0.01"
-                value={formData.pnl}
-                onChange={(e) => handleInputChange('pnl', e.target.value)}
-                placeholder="500.00"
-                className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400"
+                value={formData.exitPrice}
+                onChange={(e) => setFormData(prev => ({ ...prev, exitPrice: e.target.value }))}
+                className="border-purple-500/30 bg-trading-blue/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-white">Date</Label>
+              <Input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                className="border-purple-500/30 bg-trading-blue/50 text-white"
                 required
               />
             </div>
 
-            {/* Remarks */}
-            <div className="space-y-2">
+            <div>
+              <Label className="text-white">Status</Label>
+              <Select value={formData.status} onValueChange={(value: 'open' | 'closed') => setFormData(prev => ({ ...prev, status: value }))}>
+                <SelectTrigger className="border-purple-500/30 bg-trading-blue/50 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Open</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <Label className="text-white">Remarks</Label>
               <Textarea
                 value={formData.remarks}
-                onChange={(e) => handleInputChange('remarks', e.target.value)}
-                placeholder="Trade notes and analysis..."
-                className="border-trading-mint/30 bg-trading-blue/50 text-white placeholder:text-gray-400 min-h-20"
+                onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
+                placeholder="Add notes about this trade..."
+                className="border-purple-500/30 bg-trading-blue/50 text-white"
               />
             </div>
 
-            {/* Buttons */}
-            <div className="flex space-x-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                className="flex-1 border-trading-mint/30 text-white hover:bg-trading-mint/20"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-mint hover:scale-105 transform transition-all duration-300"
-              >
+            <div className="flex space-x-4 pt-4">
+              <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:scale-105 transition-all">
                 Add Trade
+              </Button>
+              <Button type="button" variant="outline" onClick={onCancel} className="flex-1 border-purple-500/30 text-white hover:bg-purple-500/20">
+                Cancel
               </Button>
             </div>
           </form>
