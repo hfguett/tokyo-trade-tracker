@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import LandingPage from '@/components/LandingPage';
-import TradingDashboard from '@/components/TradingDashboard';
+import MainApp from '@/components/MainApp';
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -10,16 +10,12 @@ const Index = () => {
     setShowDashboard(true);
   };
 
-  const handleBackToLanding = () => {
-    setShowDashboard(false);
-  };
-
   return (
     <div className="min-h-screen">
       {!showDashboard ? (
         <LandingPage onAccessClick={handleAccessClick} />
       ) : (
-        <TradingDashboard />
+        <MainApp />
       )}
     </div>
   );
