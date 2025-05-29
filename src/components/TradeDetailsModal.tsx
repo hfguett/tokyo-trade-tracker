@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { X, Edit2, Save, Cancel } from 'lucide-react';
+import { X, Edit2, Save } from 'lucide-react';
 import { Trade } from './TradingDashboard';
 
 interface TradeDetailsModalProps {
@@ -150,7 +149,7 @@ const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, o
                 Save Changes
               </Button>
               <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1 border-purple-500/30 text-white">
-                <Cancel className="h-4 w-4 mr-2" />
+                <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
             </div>
