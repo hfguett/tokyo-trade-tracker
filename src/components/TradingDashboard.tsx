@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { TrendingUp, Plus, DollarSign, Target, Bell, Settings, Download } from 'lucide-react';
+import { TrendingUp, Plus, DollarSign, Target, Bell, Settings, Download, Zap, BarChart3, PieChart } from 'lucide-react';
 import AddTradeForm from './AddTradeForm';
 import TradeDetailsModal from './TradeDetailsModal';
 import { gsap } from 'gsap';
@@ -30,6 +29,7 @@ interface TradingDashboardProps {
 const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, accentColor }) => {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -110,6 +110,26 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
     setSelectedTrade(null);
   };
 
+  const handleStatClick = (statType: string) => {
+    setSelectedStat(statType);
+    
+    // Animate clicked card
+    gsap.to(`[data-stat="${statType}"]`, {
+      scale: 1.05,
+      duration: 0.2,
+      yoyo: true,
+      repeat: 1,
+      ease: "power2.out"
+    });
+
+    // Show relevant information or open analytics
+    setTimeout(() => {
+      if (statType === 'pnl' || statType === 'winrate' || statType === 'avg') {
+        alert(`${statType.toUpperCase()} Analytics: This feature shows detailed breakdown of your ${statType} performance. Full analytics available in the Analytics page.`);
+      }
+    }, 400);
+  };
+
   return (
     <div className="ml-0 lg:ml-64 p-4 lg:p-8 min-h-screen pt-16 lg:pt-8">
       {/* Enhanced Header */}
@@ -134,22 +154,29 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
             <Download className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" />
             Export
           </Button>
+          
+          {/* Elite Access Button */}
           <Button 
             onClick={() => setShowAddForm(true)}
-            className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg glow-effect text-xs lg:text-sm`}
+            className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg glow-effect text-xs lg:text-sm relative overflow-hidden group`}
           >
-            <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
-            Add Trade
+            <Zap className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2 animate-pulse" />
+            Access Elite Functions
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           </Button>
         </div>
       </div>
 
-      {/* Enhanced Stats Cards */}
+      {/* Enhanced Interactive Stats Cards */}
       <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 lg:gap-6 mb-8">
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+        <Card 
+          data-stat="pnl"
+          onClick={() => handleStatClick('pnl')}
+          className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover cursor-pointer hover:scale-105 transform"
+        >
           <CardHeader className="pb-2 lg:pb-3">
             <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
-              <DollarSign className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              <DollarSign className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'} animate-pulse`} />
               <span className="hidden sm:inline">Total PnL</span>
               <span className="sm:hidden">PnL</span>
             </CardTitle>
@@ -159,15 +186,19 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
               ${totalPnL.toFixed(0)}
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {totalTrades} trades
+              {totalTrades} trades • Click for details
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+        <Card 
+          data-stat="winrate"
+          onClick={() => handleStatClick('winrate')}
+          className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover cursor-pointer hover:scale-105 transform"
+        >
           <CardHeader className="pb-2 lg:pb-3">
             <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
-              <Target className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              <Target className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'} animate-pulse`} />
               Win Rate
             </CardTitle>
           </CardHeader>
@@ -176,14 +207,19 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
               {winRate.toFixed(1)}%
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {profitableTrades} wins
+              {profitableTrades} wins • Click for breakdown
             </div>
           </CardContent>
         </Card>
 
-        <Card className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover">
+        <Card 
+          data-stat="avg"
+          onClick={() => handleStatClick('avg')}
+          className="trading-card border-trading-mint/20 hover:border-trading-mint/40 transition-all duration-300 glow-hover cursor-pointer hover:scale-105 transform"
+        >
           <CardHeader className="pb-2 lg:pb-3">
-            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <BarChart3 className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'} animate-pulse`} />
               <span className="hidden lg:inline">Average Trade</span>
               <span className="lg:hidden">Avg Trade</span>
             </CardTitle>
@@ -191,6 +227,9 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
           <CardContent className="pt-0">
             <div className={`text-lg lg:text-2xl font-bold glow-text ${avgTrade >= 0 ? 'text-trading-mint' : 'text-red-400'}`}>
               ${avgTrade.toFixed(0)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              Click for analysis
             </div>
           </CardContent>
         </Card>
@@ -250,18 +289,55 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
         </Card>
       </div>
 
+      {/* Quick Action Buttons */}
+      <div className="mb-8">
+        <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+          <Button 
+            onClick={() => setShowAddForm(true)}
+            className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg glow-effect`}
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Add New Trade
+          </Button>
+          <Button 
+            variant="outline" 
+            className={`${accentColor === 'mint' ? 'border-trading-mint/30 hover:bg-trading-mint/20' : 'border-purple-500/30 hover:bg-purple-500/20'} text-white hover:scale-105 transform transition-all duration-300`}
+          >
+            <BarChart3 className="h-5 w-5 mr-2" />
+            View Analytics
+          </Button>
+          <Button 
+            variant="outline" 
+            className={`${accentColor === 'mint' ? 'border-trading-mint/30 hover:bg-trading-mint/20' : 'border-purple-500/30 hover:bg-purple-500/20'} text-white hover:scale-105 transform transition-all duration-300`}
+          >
+            <PieChart className="h-5 w-5 mr-2" />
+            Portfolio Overview
+          </Button>
+        </div>
+      </div>
+
       {/* Recent Trades */}
       <div ref={contentRef}>
         <Card className="trading-card border-trading-mint/30 hover:border-trading-mint/50 transition-all duration-300 glow-hover">
           <CardHeader>
-            <CardTitle className="text-white glow-text">Recent Trades</CardTitle>
+            <CardTitle className="text-white glow-text flex items-center">
+              <TrendingUp className="h-6 w-6 mr-3 text-trading-mint animate-pulse" />
+              Recent Trading Activity
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {trades.length === 0 ? (
               <div className="text-center py-8 lg:py-12">
                 <div className="text-3xl lg:text-4xl mb-4">📊</div>
-                <div className="text-lg text-gray-300">No trades yet</div>
-                <div className="text-sm text-gray-400 mt-2">Add your first trade to get started</div>
+                <div className="text-lg text-gray-300">Ready to start your trading journey?</div>
+                <div className="text-sm text-gray-400 mt-2 mb-6">Click "Access Elite Functions" to add your first trade</div>
+                <Button 
+                  onClick={() => setShowAddForm(true)}
+                  className={`${accentClass} hover:scale-105 transform transition-all duration-300 shadow-lg glow-effect`}
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Start Trading Now
+                </Button>
               </div>
             ) : (
               <div className="space-y-3">
@@ -276,6 +352,9 @@ const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, 
                         <div className="font-bold text-white glow-text">{trade.symbol}</div>
                         <div className="text-xs lg:text-sm text-gray-300">
                           {trade.type.toUpperCase()} {trade.quantity} @ ${trade.entryPrice}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Click to view details
                         </div>
                       </div>
                       <div className={`text-sm lg:text-lg font-bold glow-text ${trade.pnl >= 0 ? 'text-trading-mint' : 'text-red-400'}`}>
