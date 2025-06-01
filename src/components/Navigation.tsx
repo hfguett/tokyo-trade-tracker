@@ -9,12 +9,14 @@ import {
   BookOpen, 
   Settings, 
   PieChart,
-  TrendingUp,
+  Brain,
   Shield,
   Newspaper,
   Activity,
   Menu,
-  X
+  X,
+  Globe,
+  Camera
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -32,15 +34,14 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
     { id: 'market', label: 'Market Overview', icon: Activity },
-    { id: 'news', label: 'Market News', icon: Newspaper },
-    { id: 'journal', label: 'Journal', icon: BookOpen },
+    { id: 'news', label: 'Market Intelligence', icon: Newspaper },
+    { id: 'journal', label: 'Smart Journal', icon: BookOpen },
     { id: 'risk', label: 'Risk Management', icon: Shield },
     { id: 'goals', label: 'Goals & Targets', icon: Target },
+    { id: 'worldclock', label: 'World Clock', icon: Globe },
+    { id: 'ocr', label: 'OCR Import', icon: Camera },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
-
-  const accentClass = accentColor === 'mint' ? 'border-trading-mint bg-gradient-mint shadow-mint-500/25' : 'border-purple-500 bg-gradient-to-r from-purple-600 to-purple-700 shadow-purple-500/25';
-  const hoverClass = accentColor === 'mint' ? 'hover:border-trading-mint/50 hover:shadow-mint-500/20' : 'hover:border-purple-500/50 hover:shadow-purple-500/20';
 
   const handleNavClick = (page: string) => {
     onPageChange(page);
@@ -54,7 +55,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
         <Button
           variant="ghost"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-trading-dark-blue/90 border border-trading-mint/30 text-white hover:bg-trading-mint/20"
+          className="bg-gradient-to-r from-slate-900 to-slate-800 border-2 border-trading-mint/40 text-white hover:bg-trading-mint/20 hover:border-trading-mint/70 shadow-lg hover:shadow-trading-mint/30 transition-all duration-300"
         >
           {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
@@ -63,22 +64,28 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/70 z-40 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Navigation Sidebar */}
       <nav className={`
-        w-64 h-screen bg-trading-dark-blue border-r border-trading-mint/20 p-4 fixed left-0 top-0 z-40 transform transition-transform duration-300
+        w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r-2 border-trading-mint/30 p-6 fixed left-0 top-0 z-40 transform transition-transform duration-300 shadow-2xl
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="flex items-center mb-8">
-          <TrendingUp className={`h-8 w-8 mr-3 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'} glow-effect`} />
-          <h2 className="text-xl font-bold text-white">TradePro Elite</h2>
+        <div className="flex items-center mb-10">
+          <div className="relative">
+            <Brain className="h-10 w-10 mr-4 text-trading-mint glow-effect animate-pulse" />
+            <div className="absolute inset-0 bg-trading-mint/30 rounded-full blur-lg"></div>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white glow-text">Smart Journal</h2>
+            <p className="text-xs text-trading-mint/70">Trading Intelligence</p>
+          </div>
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-3">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -88,14 +95,17 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
                 key={item.id}
                 variant="ghost"
                 onClick={() => handleNavClick(item.id)}
-                className={`w-full justify-start text-left p-3 h-auto transition-all duration-300 ${
+                className={`w-full justify-start text-left p-4 h-auto transition-all duration-300 group relative overflow-hidden ${
                   isActive 
-                    ? `${accentClass} text-white shadow-lg glow-effect` 
-                    : `text-gray-300 hover:text-white hover:bg-trading-blue/50 ${hoverClass}`
+                    ? 'bg-gradient-to-r from-teal-700 via-trading-mint to-emerald-600 text-white shadow-lg shadow-trading-mint/40 border-2 border-trading-mint/50' 
+                    : 'text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-slate-800 hover:to-slate-700 border-2 border-transparent hover:border-trading-mint/40 hover:shadow-lg hover:shadow-trading-mint/20'
                 }`}
               >
-                <Icon className="h-5 w-5 mr-3" />
+                <Icon className={`h-5 w-5 mr-4 transition-transform duration-300 ${isActive ? 'animate-pulse' : 'group-hover:scale-110'}`} />
                 <span className="font-medium">{item.label}</span>
+                {isActive && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-pulse"></div>
+                )}
               </Button>
             );
           })}
@@ -104,7 +114,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
         {/* Mobile Footer */}
         <div className="lg:hidden absolute bottom-4 left-4 right-4">
           <div className="text-xs text-gray-500 text-center">
-            TradePro Elite v2.0
+            Smart Journal v3.0 - Professional Trading Intelligence
           </div>
         </div>
       </nav>

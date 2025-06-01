@@ -12,6 +12,8 @@ import TradingNews from './TradingNews';
 import JournalPage from './JournalPage';
 import RiskManagementPage from './RiskManagementPage';
 import GoalsPage from './GoalsPage';
+import WorldClockPage from './WorldClockPage';
+import OCRImportPage from './OCRImportPage';
 import { Trade } from './TradingDashboard';
 
 const MainApp: React.FC = () => {
@@ -47,9 +49,9 @@ const MainApp: React.FC = () => {
         return <TradingDashboard trades={trades} setTrades={setTrades} accentColor={accentColor} />;
       case 'calendar':
         return (
-          <div className="ml-0 lg:ml-64 p-4 lg:p-8 min-h-screen trading-gradient">
+          <div className="ml-0 lg:ml-72 p-4 lg:p-8 min-h-screen trading-gradient">
             <div className="mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Trading Calendar</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2 glow-text">Trading Calendar</h1>
               <p className="text-gray-400">View and manage your trades by date</p>
             </div>
             <TradeCalendar trades={trades} onTradeClick={handleTradeClick} />
@@ -69,6 +71,10 @@ const MainApp: React.FC = () => {
         return <RiskManagementPage trades={trades} accentColor={accentColor} />;
       case 'goals':
         return <GoalsPage trades={trades} accentColor={accentColor} />;
+      case 'worldclock':
+        return <WorldClockPage accentColor={accentColor} />;
+      case 'ocr':
+        return <OCRImportPage accentColor={accentColor} />;
       case 'settings':
         return <SettingsPage accentColor={accentColor} onAccentColorChange={handleAccentColorChange} />;
       default:
