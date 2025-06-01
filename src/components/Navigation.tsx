@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Home, 
   Calendar, 
@@ -71,10 +72,11 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
 
       {/* Navigation Sidebar */}
       <nav className={`
-        w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r-2 border-trading-mint/30 p-6 fixed left-0 top-0 z-40 transform transition-transform duration-300 shadow-2xl
+        w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-r-2 border-trading-mint/30 fixed left-0 top-0 z-40 transform transition-transform duration-300 shadow-2xl flex flex-col
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="flex items-center mb-10">
+        {/* Header */}
+        <div className="flex items-center mb-6 p-6 flex-shrink-0">
           <div className="relative">
             <Brain className="h-10 w-10 mr-4 text-trading-mint glow-effect animate-pulse" />
             <div className="absolute inset-0 bg-trading-mint/30 rounded-full blur-lg"></div>
@@ -85,34 +87,37 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
           </div>
         </div>
         
-        <div className="space-y-3">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id;
-            
-            return (
-              <Button
-                key={item.id}
-                variant="ghost"
-                onClick={() => handleNavClick(item.id)}
-                className={`w-full justify-start text-left p-4 h-auto transition-all duration-300 group relative overflow-hidden ${
-                  isActive 
-                    ? 'bg-gradient-to-r from-teal-700 via-trading-mint to-emerald-600 text-white shadow-lg shadow-trading-mint/40 border-2 border-trading-mint/50' 
-                    : 'text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-slate-800 hover:to-slate-700 border-2 border-transparent hover:border-trading-mint/40 hover:shadow-lg hover:shadow-trading-mint/20'
-                }`}
-              >
-                <Icon className={`h-5 w-5 mr-4 transition-transform duration-300 ${isActive ? 'animate-pulse' : 'group-hover:scale-110'}`} />
-                <span className="font-medium">{item.label}</span>
-                {isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-pulse"></div>
-                )}
-              </Button>
-            );
-          })}
-        </div>
+        {/* Scrollable Menu Items */}
+        <ScrollArea className="flex-1 px-3">
+          <div className="space-y-3 pb-6">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentPage === item.id;
+              
+              return (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  onClick={() => handleNavClick(item.id)}
+                  className={`w-full justify-start text-left p-4 h-auto transition-all duration-300 group relative overflow-hidden ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-teal-700 via-trading-mint to-emerald-600 text-white shadow-lg shadow-trading-mint/40 border-2 border-trading-mint/50' 
+                      : 'text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-slate-800 hover:to-slate-700 border-2 border-transparent hover:border-trading-mint/40 hover:shadow-lg hover:shadow-trading-mint/20'
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 mr-4 transition-transform duration-300 ${isActive ? 'animate-pulse' : 'group-hover:scale-110'}`} />
+                  <span className="font-medium">{item.label}</span>
+                  {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-pulse"></div>
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+        </ScrollArea>
 
         {/* Mobile Footer */}
-        <div className="lg:hidden absolute bottom-4 left-4 right-4">
+        <div className="lg:hidden p-4 flex-shrink-0">
           <div className="text-xs text-gray-500 text-center">
             Smart Journal v3.0 - Professional Trading Intelligence
           </div>
