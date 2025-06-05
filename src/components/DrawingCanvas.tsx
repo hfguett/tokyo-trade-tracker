@@ -129,7 +129,7 @@ const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave, onClose, initialD
         <CardContent className="p-0 h-full">
           <div className="h-full bg-white rounded-b-lg overflow-hidden">
             <Excalidraw
-              ref={(api) => setExcalidrawAPI(api)}
+              excalidrawAPI={(api) => setExcalidrawAPI(api)}
               initialData={initialData}
               theme="light"
               UIOptions={{
