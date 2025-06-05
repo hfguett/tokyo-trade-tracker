@@ -17,7 +17,8 @@ import {
   Menu,
   X,
   Globe,
-  Camera
+  Camera,
+  Wallet
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -34,11 +35,12 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+    { id: 'wallet', label: 'Wallet Tracker', icon: Wallet },
     { id: 'market', label: 'Market Overview', icon: Activity },
     { id: 'news', label: 'Market Intelligence', icon: Newspaper },
     { id: 'journal', label: 'Smart Journal', icon: BookOpen },
     { id: 'risk', label: 'Risk Management', icon: Shield },
-    { id: 'goals', label: 'Goals & Targets', icon: Target },
+    { id: 'goals', label: 'Goals & Inspiration', icon: Target },
     { id: 'worldclock', label: 'World Clock', icon: Globe },
     { id: 'ocr', label: 'OCR Import', icon: Camera },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -89,7 +91,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
         
         {/* Scrollable Menu Items */}
         <ScrollArea className="flex-1 px-3">
-          <div className="space-y-3 pb-6">
+          <div className="space-y-2 pb-6">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
@@ -101,7 +103,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChange, acce
                   onClick={() => handleNavClick(item.id)}
                   className={`w-full justify-start text-left p-4 h-auto transition-all duration-300 group relative overflow-hidden ${
                     isActive 
-                      ? 'bg-gradient-to-r from-teal-700 via-trading-mint to-emerald-600 text-white shadow-lg shadow-trading-mint/40 border-2 border-trading-mint/50' 
+                      ? 'bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 border-2 border-trading-mint text-white shadow-lg shadow-trading-mint/40' 
                       : 'text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-slate-800 hover:to-slate-700 border-2 border-transparent hover:border-trading-mint/40 hover:shadow-lg hover:shadow-trading-mint/20'
                   }`}
                 >

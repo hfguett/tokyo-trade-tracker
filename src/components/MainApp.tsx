@@ -14,6 +14,7 @@ import RiskManagementPage from './RiskManagementPage';
 import GoalsPage from './GoalsPage';
 import WorldClockPage from './WorldClockPage';
 import OCRImportPage from './OCRImportPage';
+import WalletPage from './WalletPage';
 import { Trade } from './TradingDashboard';
 
 const MainApp: React.FC = () => {
@@ -75,6 +76,8 @@ const MainApp: React.FC = () => {
         return <WorldClockPage accentColor={accentColor} />;
       case 'ocr':
         return <OCRImportPage accentColor={accentColor} />;
+      case 'wallet':
+        return <WalletPage accentColor={accentColor} />;
       case 'settings':
         return <SettingsPage accentColor={accentColor} onAccentColorChange={handleAccentColorChange} />;
       default:
@@ -83,7 +86,7 @@ const MainApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen trading-gradient">
+    <div className="min-h-screen trading-gradient w-full">
       <Navigation 
         currentPage={currentPage} 
         onPageChange={handlePageChange}
