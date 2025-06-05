@@ -21,6 +21,7 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
     quantity: '',
     entryPrice: '',
     exitPrice: '',
+    leverage: '1',
     date: new Date().toISOString().split('T')[0],
     remarks: '',
     status: 'open' as 'open' | 'closed'
@@ -32,6 +33,7 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
     const entryPrice = parseFloat(formData.entryPrice);
     const exitPrice = formData.exitPrice ? parseFloat(formData.exitPrice) : undefined;
     const quantity = parseInt(formData.quantity);
+    const leverage = parseInt(formData.leverage);
     
     let pnl = 0;
     if (exitPrice) {
@@ -46,6 +48,7 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
       quantity,
       entryPrice,
       exitPrice,
+      leverage,
       date: new Date(formData.date),
       pnl,
       remarks: formData.remarks,
@@ -104,6 +107,27 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
                 />
               </div>
               <div>
+                <Label className="text-white">Leverage</Label>
+                <Select value={formData.leverage} onValueChange={(value: string) => setFormData(prev => ({ ...prev, leverage: value }))}>
+                  <SelectTrigger className="border-purple-500/30 bg-trading-blue/50 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1x</SelectItem>
+                    <SelectItem value="2">2x</SelectItem>
+                    <SelectItem value="3">3x</SelectItem>
+                    <SelectItem value="5">5x</SelectItem>
+                    <SelectItem value="10">10x</SelectItem>
+                    <SelectItem value="20">20x</SelectItem>
+                    <SelectItem value="50">50x</SelectItem>
+                    <SelectItem value="100">100x</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
                 <Label className="text-white">Entry Price</Label>
                 <Input
                   type="number"
@@ -114,17 +138,16 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
                   required
                 />
               </div>
-            </div>
-
-            <div>
-              <Label className="text-white">Exit Price (Optional)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.exitPrice}
-                onChange={(e) => setFormData(prev => ({ ...prev, exitPrice: e.target.value }))}
-                className="border-purple-500/30 bg-trading-blue/50 text-white"
-              />
+              <div>
+                <Label className="text-white">Exit Price (Optional)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.exitPrice}
+                  onChange={(e) => setFormData(prev => ({ ...prev, exitPrice: e.target.value }))}
+                  className="border-purple-500/30 bg-trading-blue/50 text-white"
+                />
+              </div>
             </div>
 
             <div>
