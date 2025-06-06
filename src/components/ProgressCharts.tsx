@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Trade } from './TradingDashboard';
+import { Trade } from '@/types/Trade';
 import { format, startOfWeek, startOfMonth, isWithinInterval, subDays, subWeeks, subMonths } from 'date-fns';
 
 interface ProgressChartsProps {

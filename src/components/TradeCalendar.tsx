@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
-import { Trade } from './TradingDashboard';
+import { Trade } from '@/types/Trade';
 import { gsap } from 'gsap';
 
 interface TradeCalendarProps {

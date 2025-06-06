@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,10 +22,25 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
     entryPrice: '',
     exitPrice: '',
     leverage: '1',
+    exchange: '',
     date: new Date().toISOString().split('T')[0],
     remarks: '',
     status: 'open' as 'open' | 'closed'
   });
+
+  const exchanges = [
+    'Binance',
+    'Coinbase Pro',
+    'Kraken',
+    'Bybit',
+    'OKX',
+    'KuCoin',
+    'Huobi',
+    'FTX',
+    'Gate.io',
+    'Bitfinex',
+    'Other'
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +64,7 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
       entryPrice,
       exitPrice,
       leverage,
+      exchange: formData.exchange,
       date: new Date(formData.date),
       pnl,
       remarks: formData.remarks,
@@ -59,26 +76,47 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md trading-card">
-        <CardHeader>
+      <Card className="w-full max-w-md lg:max-w-lg trading-card max-h-[90vh] overflow-y-auto">
+        <CardHeader className="p-4 lg:p-6">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-white">Add New Trade</CardTitle>
+            <CardTitle className="text-white text-lg lg:text-xl">Add New Trade</CardTitle>
             <Button variant="ghost" size="sm" onClick={onCancel}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 lg:p-6 pt-0">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label className="text-white">Symbol</Label>
-              <Input
-                value={formData.symbol}
-                onChange={(e) => setFormData(prev => ({ ...prev, symbol: e.target.value }))}
-                placeholder="AAPL, TSLA, etc."
-                className="border-purple-500/30 bg-trading-blue/50 text-white"
-                required
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-white">Symbol</Label>
+                <Input
+                  value={formData.symbol}
+                  onChange={(e) => setFormData(prev => ({ ...prev, symbol: e.target.value }))}
+                  placeholder="BTC, ETH, AAPL..."
+                  className="border-purple-500/30 bg-trading-blue/50 text-white"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label className="text-white">Exchange</Label>
+                <Select 
+                  value={formData.exchange} 
+                  onValueChange={(value: string) => setFormData(prev => ({ ...prev, exchange: value }))}
+                >
+                  <SelectTrigger className="border-purple-500/30 bg-trading-blue/50 text-white">
+                    <SelectValue placeholder="Select exchange" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {exchanges.map((exchange) => (
+                      <SelectItem key={exchange} value={exchange}>
+                        {exchange}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div>
@@ -183,7 +221,7 @@ const AddTradeForm: React.FC<AddTradeFormProps> = ({ onSubmit, onCancel }) => {
               />
             </div>
 
-            <div className="flex space-x-4 pt-4">
+            <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 pt-4">
               <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:scale-105 transition-all">
                 Add Trade
               </Button>

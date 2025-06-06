@@ -13,9 +13,8 @@ import JournalPage from './JournalPage';
 import RiskManagementPage from './RiskManagementPage';
 import GoalsPage from './GoalsPage';
 import WorldClockPage from './WorldClockPage';
-import OCRImportPage from './OCRImportPage';
 import WalletPage from './WalletPage';
-import { Trade } from './TradingDashboard';
+import { Trade } from '@/types/Trade';
 
 const MainApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -47,7 +46,7 @@ const MainApp: React.FC = () => {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <TradingDashboard trades={trades} setTrades={setTrades} accentColor={accentColor} />;
+        return <TradingDashboard trades={trades} setTrades={setTrades} accentColor={accentColor} onTradeClick={handleTradeClick} />;
       case 'calendar':
         return (
           <div className="ml-0 lg:ml-72 p-4 lg:p-8 min-h-screen trading-gradient">
@@ -61,7 +60,7 @@ const MainApp: React.FC = () => {
       case 'analytics':
         return <AnalyticsPage trades={trades} accentColor={accentColor} />;
       case 'portfolio':
-        return <PortfolioPage trades={trades} accentColor={accentColor} />;
+        return <PortfolioPage trades={trades} accentColor={accentColor} setTrades={setTrades} />;
       case 'market':
         return <MarketOverview accentColor={accentColor} />;
       case 'news':
@@ -74,14 +73,12 @@ const MainApp: React.FC = () => {
         return <GoalsPage trades={trades} accentColor={accentColor} />;
       case 'worldclock':
         return <WorldClockPage accentColor={accentColor} />;
-      case 'ocr':
-        return <OCRImportPage accentColor={accentColor} />;
       case 'wallet':
         return <WalletPage accentColor={accentColor} />;
       case 'settings':
         return <SettingsPage accentColor={accentColor} onAccentColorChange={handleAccentColorChange} />;
       default:
-        return <TradingDashboard trades={trades} setTrades={setTrades} accentColor={accentColor} />;
+        return <TradingDashboard trades={trades} setTrades={setTrades} accentColor={accentColor} onTradeClick={handleTradeClick} />;
     }
   };
 

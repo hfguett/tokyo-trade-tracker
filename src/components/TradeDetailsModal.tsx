@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Edit2, Save } from 'lucide-react';
-import { Trade } from './TradingDashboard';
+import { Trade } from '@/types/Trade';
 
 interface TradeDetailsModalProps {
   trade: Trade;
@@ -46,12 +47,12 @@ const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, o
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md trading-card">
-        <CardHeader>
+      <Card className="w-full max-w-md lg:max-w-lg trading-card max-h-[90vh] overflow-y-auto">
+        <CardHeader className="p-4 lg:p-6">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-white flex items-center text-lg lg:text-xl">
               {trade.symbol} Trade Details
-              <Badge className={`ml-2 ${trade.pnl >= 0 ? 'bg-purple-600' : 'bg-red-600'}`}>
+              <Badge className={`ml-2 text-xs lg:text-sm ${trade.pnl >= 0 ? 'bg-purple-600' : 'bg-red-600'}`}>
                 ${trade.pnl.toFixed(2)}
               </Badge>
             </CardTitle>
@@ -67,7 +68,7 @@ const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, o
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 lg:p-6 pt-0 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-gray-300">Type</Label>
@@ -78,6 +79,13 @@ const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, o
               <div className="text-white font-medium">{trade.quantity}</div>
             </div>
           </div>
+
+          {trade.exchange && (
+            <div>
+              <Label className="text-gray-300">Exchange</Label>
+              <div className="text-white font-medium">{trade.exchange}</div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -143,7 +151,7 @@ const TradeDetailsModal: React.FC<TradeDetailsModalProps> = ({ trade, onClose, o
           </div>
 
           {isEditing ? (
-            <div className="flex space-x-4 pt-4">
+            <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4 pt-4">
               <Button onClick={handleSave} className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700">
                 <Save className="h-4 w-4 mr-2" />
                 Save Changes

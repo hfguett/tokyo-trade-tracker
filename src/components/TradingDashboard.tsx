@@ -14,10 +14,33 @@ interface TradingDashboardProps {
   trades: Trade[];
   setTrades: React.Dispatch<React.SetStateAction<Trade[]>>;
   accentColor: 'mint' | 'purple';
+  onTradeClick?: (trade: Trade) => void;
 }
 
-const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, accentColor }) => {
-  return <EnhancedDashboard accentColor={accentColor} />;
+const TradingDashboard: React.FC<TradingDashboardProps> = ({ trades, setTrades, accentColor, onTradeClick }) => {
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const handleAddTrade = (trade: Omit<Trade, 'id'>) => {
+    const newTrade: Trade = {
+      ...trade,
+      id: Date.now().toString()
+    };
+    setTrades(prev => [...prev, newTrade]);
+    setShowAddForm(false);
+  };
+
+  return (
+    <div className="relative">
+      <EnhancedDashboard accentColor={accentColor} onAddTrade={() => setShowAddForm(true)} trades={trades} onTradeClick={onTradeClick} />
+      
+      {showAddForm && (
+        <AddTradeForm
+          onSubmit={handleAddTrade}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default TradingDashboard;

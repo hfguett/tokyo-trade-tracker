@@ -1,9 +1,11 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
-import { TrendingUp, Calendar, Clock, Target } from 'lucide-react';
-import { Trade } from './TradingDashboard';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line, Area, AreaChart } from 'recharts';
+import { Trade } from '@/types/Trade';
+import { TrendingUp, TrendingDown, Target, Activity, DollarSign, Calendar, BarChart3 } from 'lucide-react';
 import { gsap } from 'gsap';
 
 interface AnalyticsPageProps {
@@ -18,127 +20,168 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ trades, accentColor }) =>
   const accentColorValue = accentColor === 'mint' ? '#10b981' : '#8b5cf6';
 
   useEffect(() => {
-    gsap.from(pageRef.current, {
-      opacity: 0,
-      x: 100,
-      duration: 0.8,
-      ease: "power3.out"
-    });
+    if (pageRef.current) {
+      gsap.from(pageRef.current, {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        ease: "power3.out"
+      });
+    }
 
-    gsap.from(chartsRef.current?.children, {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.6,
-      stagger: 0.15,
-      ease: "back.out(1.7)",
-      delay: 0.4
-    });
+    if (chartsRef.current?.children) {
+      gsap.from(chartsRef.current.children, {
+        y: 80,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "back.out(1.7)",
+        delay: 0.3
+      });
+    }
   }, []);
 
-  // Create cumulative P&L data
-  const cumulativePnL = trades
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .reduce((acc, trade, index) => {
-      const cumulative = index === 0 ? trade.pnl : acc[index - 1].cumulative + trade.pnl;
-      acc.push({
-        date: trade.date.toLocaleDateString(),
-        cumulative,
-        pnl: trade.pnl,
-        symbol: trade.symbol
-      });
-      return acc;
-    }, [] as Array<{ date: string; cumulative: number; pnl: number; symbol: string }>);
-
-  // Daily performance
-  const dailyPerformance = trades.reduce((acc, trade) => {
-    const date = trade.date.toLocaleDateString();
-    const existing = acc.find(item => item.date === date);
-    if (existing) {
-      existing.totalPnL += trade.pnl;
-      existing.trades += 1;
-    } else {
-      acc.push({ date, totalPnL: trade.pnl, trades: 1 });
-    }
-    return acc;
-  }, [] as Array<{ date: string; totalPnL: number; trades: number }>);
+  // Calculate analytics data
+  const totalTrades = trades.length;
+  const winningTrades = trades.filter(trade => trade.pnl > 0).length;
+  const losingTrades = trades.filter(trade => trade.pnl < 0).length;
+  const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+  const totalPnL = trades.reduce((sum, trade) => sum + trade.pnl, 0);
+  const avgWin = winningTrades > 0 ? trades.filter(t => t.pnl > 0).reduce((sum, t) => sum + t.pnl, 0) / winningTrades : 0;
+  const avgLoss = losingTrades > 0 ? Math.abs(trades.filter(t => t.pnl < 0).reduce((sum, t) => sum + t.pnl, 0) / losingTrades) : 0;
 
   // Symbol performance
   const symbolPerformance = trades.reduce((acc, trade) => {
     const existing = acc.find(item => item.symbol === trade.symbol);
     if (existing) {
-      existing.totalPnL += trade.pnl;
+      existing.pnl += trade.pnl;
       existing.trades += 1;
-      existing.winRate = (existing.wins / existing.trades) * 100;
-      if (trade.pnl > 0) existing.wins += 1;
     } else {
-      acc.push({
-        symbol: trade.symbol,
-        totalPnL: trade.pnl,
-        trades: 1,
-        wins: trade.pnl > 0 ? 1 : 0,
-        winRate: trade.pnl > 0 ? 100 : 0
+      acc.push({ symbol: trade.symbol, pnl: trade.pnl, trades: 1 });
+    }
+    return acc;
+  }, [] as Array<{ symbol: string; pnl: number; trades: number }>);
+
+  // Monthly performance
+  const monthlyData = trades.reduce((acc, trade) => {
+    const month = trade.date.toLocaleString('default', { month: 'short', year: '2-digit' });
+    const existing = acc.find(item => item.month === month);
+    if (existing) {
+      existing.pnl += trade.pnl;
+      existing.volume += trade.quantity * trade.entryPrice;
+    } else {
+      acc.push({ 
+        month, 
+        pnl: trade.pnl, 
+        volume: trade.quantity * trade.entryPrice,
+        trades: 1 
       });
     }
     return acc;
-  }, [] as Array<{ symbol: string; totalPnL: number; trades: number; wins: number; winRate: number }>);
+  }, [] as Array<{ month: string; pnl: number; volume: number; trades: number }>);
+
+  const COLORS = [accentColorValue, '#ef4444', '#f59e0b', '#06b6d4', '#8b5cf6', '#ec4899'];
 
   return (
-    <div ref={pageRef} className="p-8 ml-64 min-h-screen trading-gradient">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Advanced Analytics</h1>
-        <p className="text-gray-400">Deep insights into your trading performance and patterns</p>
+    <div ref={pageRef} className="p-4 lg:p-8 ml-0 lg:ml-72 min-h-screen trading-gradient">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2 glow-text">Advanced Analytics</h1>
+        <p className="text-gray-400 text-sm lg:text-base">Deep insights into your trading performance and patterns</p>
       </div>
 
-      <div ref={chartsRef} className="space-y-8">
-        {/* Cumulative P&L Chart */}
+      {/* Key Metrics - Mobile Optimized */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 lg:mb-8">
         <Card className="trading-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <TrendingUp className={`h-5 w-5 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
-              Cumulative P&L Performance
+          <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <Activity className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              Win Rate
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={cumulativePnL}>
-                <XAxis dataKey="date" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: `1px solid ${accentColorValue}`, 
-                    borderRadius: '8px' 
-                  }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="cumulative" 
-                  stroke={accentColorValue} 
-                  fill={`${accentColorValue}20`}
-                  strokeWidth={3}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <CardContent className="p-3 lg:p-6 pt-0">
+            <div className={`text-xl lg:text-3xl font-bold ${winRate >= 60 ? 'profit-glow' : winRate >= 40 ? 'text-yellow-400' : 'loss-glow'}`}>
+              {winRate.toFixed(1)}%
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {winningTrades}W / {losingTrades}L
+            </div>
           </CardContent>
         </Card>
 
-        {/* Daily Performance and Trade Count */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="trading-card">
+          <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <DollarSign className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              Total P&L
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 lg:p-6 pt-0">
+            <div className={`text-xl lg:text-3xl font-bold ${totalPnL >= 0 ? 'profit-glow' : 'loss-glow'}`}>
+              ${totalPnL.toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {totalTrades} trades
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="trading-card">
+          <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <TrendingUp className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              Avg Win
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 lg:p-6 pt-0">
+            <div className="text-xl lg:text-3xl font-bold profit-glow">
+              ${avgWin.toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              Per winning trade
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="trading-card">
+          <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
+            <CardTitle className="text-xs lg:text-sm font-medium text-gray-300 flex items-center">
+              <TrendingDown className={`h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
+              Avg Loss
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 lg:p-6 pt-0">
+            <div className="text-xl lg:text-3xl font-bold loss-glow">
+              ${avgLoss.toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              Per losing trade
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts Section - Mobile Responsive */}
+      <div ref={chartsRef} className="space-y-6 lg:space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          {/* Symbol Performance */}
           <Card className="trading-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Calendar className={`h-5 w-5 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
-                Daily P&L Distribution
-              </CardTitle>
+            <CardHeader className="p-4 lg:p-6">
+              <CardTitle className="text-white text-lg lg:text-xl">Symbol Performance</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={dailyPerformance}>
-                  <XAxis dataKey="date" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <Tooltip />
+            <CardContent className="p-4 lg:p-6 pt-0">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={symbolPerformance}>
+                  <XAxis dataKey="symbol" stroke="#9ca3af" fontSize={12} />
+                  <YAxis stroke="#9ca3af" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1e293b', 
+                      border: '1px solid #334155',
+                      borderRadius: '8px'
+                    }}
+                  />
                   <Bar 
-                    dataKey="totalPnL" 
+                    dataKey="pnl" 
                     fill={accentColorValue}
                     radius={[4, 4, 0, 0]}
                   />
@@ -147,150 +190,64 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ trades, accentColor }) =>
             </CardContent>
           </Card>
 
+          {/* Monthly Performance */}
           <Card className="trading-card">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <Clock className={`h-5 w-5 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
-                Trading Activity
-              </CardTitle>
+            <CardHeader className="p-4 lg:p-6">
+              <CardTitle className="text-white text-lg lg:text-xl">Monthly Trend</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={dailyPerformance}>
-                  <XAxis dataKey="date" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="trades" 
-                    stroke={accentColorValue} 
-                    strokeWidth={3}
-                    dot={{ fill: accentColorValue, strokeWidth: 2, r: 4 }}
+            <CardContent className="p-4 lg:p-6 pt-0">
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={monthlyData}>
+                  <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
+                  <YAxis stroke="#9ca3af" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1e293b', 
+                      border: '1px solid #334155',
+                      borderRadius: '8px'
+                    }}
                   />
-                </LineChart>
+                  <Area 
+                    type="monotone" 
+                    dataKey="pnl" 
+                    stroke={accentColorValue} 
+                    fill={`${accentColorValue}20`}
+                    strokeWidth={2}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
 
-        {/* Symbol Performance Analysis */}
+        {/* Trading Volume Chart */}
         <Card className="trading-card">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Target className={`h-5 w-5 mr-2 ${accentColor === 'mint' ? 'text-trading-mint' : 'text-purple-400'}`} />
-              Symbol Performance Analysis
-            </CardTitle>
+          <CardHeader className="p-4 lg:p-6">
+            <CardTitle className="text-white text-lg lg:text-xl">Trading Volume Analysis</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {symbolPerformance.map((symbol, index) => (
-                <div key={symbol.symbol} className="p-4 rounded-xl border border-trading-mint/30 bg-trading-blue/40">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-bold text-white">{symbol.symbol}</h3>
-                    <span className={`text-sm font-medium ${symbol.totalPnL >= 0 ? 'profit-glow' : 'loss-glow'}`}>
-                      ${symbol.totalPnL.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Total Trades:</span>
-                      <span className="text-white">{symbol.trades}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Win Rate:</span>
-                      <span className="text-white">{symbol.winRate.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Avg per Trade:</span>
-                      <span className={symbol.totalPnL >= 0 ? 'profit-glow' : 'loss-glow'}>
-                        ${(symbol.totalPnL / symbol.trades).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <CardContent className="p-4 lg:p-6 pt-0">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyData}>
+                <XAxis dataKey="month" stroke="#9ca3af" />
+                <YAxis stroke="#9ca3af" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1e293b', 
+                    border: '1px solid #334155',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="volume" 
+                  stroke="#f59e0b" 
+                  strokeWidth={3}
+                  dot={{ fill: '#f59e0b', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        {/* Advanced Metrics */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="trading-card">
-            <CardHeader>
-              <CardTitle className="text-white">Trading Patterns</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Best Trading Day</span>
-                <span className="text-white">Monday</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Avg Holding Period</span>
-                <span className="text-white">2.3 days</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Most Traded Symbol</span>
-                <span className="text-white">{symbolPerformance[0]?.symbol || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Longest Win Streak</span>
-                <span className="profit-glow">7 trades</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="trading-card">
-            <CardHeader>
-              <CardTitle className="text-white">Risk Analysis</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Risk/Reward Ratio</span>
-                <span className="text-white">1:2.4</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Max Risk per Trade</span>
-                <span className="text-yellow-400">2.5%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Portfolio Heat</span>
-                <span className="text-red-400">15%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300">Recovery Factor</span>
-                <span className="text-white">3.2</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="trading-card">
-            <CardHeader>
-              <CardTitle className="text-white">Performance Score</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className={`text-4xl font-bold mb-2 ${accentColor === 'mint' ? 'profit-glow' : 'text-purple-400'}`}>
-                  8.5/10
-                </div>
-                <p className="text-gray-300 text-sm">Overall Performance</p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">Consistency</span>
-                  <span className="text-white">9/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">Risk Management</span>
-                  <span className="text-white">8/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">Profitability</span>
-                  <span className="text-white">8.5/10</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
