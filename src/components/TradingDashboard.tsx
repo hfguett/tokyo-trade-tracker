@@ -11,16 +11,18 @@ import EnhancedDashboard from './EnhancedDashboard';
 
 export interface Trade {
   id: string;
-  pair: string;
+  symbol: string;
   type: 'buy' | 'sell';
-  amount: number;
-  price: number;
+  quantity: number;
+  entryPrice: number;
+  exitPrice?: number;
+  leverage: number;
   date: Date;
-  pnl?: number;
+  pnl: number;
   fees?: number;
   exchange?: string;
   strategy?: string;
-  notes?: string;
+  remarks?: string;
   status: 'open' | 'closed';
 }
 

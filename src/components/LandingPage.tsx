@@ -1,153 +1,82 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Calendar, Target, BarChart3, DollarSign, Activity, Shield, Zap, Award, TrendingDown, PenTool, Globe, Camera, Brain, Star, Users, BookOpen, LineChart, Palette, Layers } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, Zap, Shield, BarChart3, Users, Star, ArrowRight, Play, CheckCircle, Target, Rocket, Globe } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import TradingChart from './TradingChart';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface LandingPageProps {
-  onAccessClick: () => void;
+  onGetStarted: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onAccessClick }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
-  const chartDemoRef = useRef<HTMLDivElement>(null);
+  const benefitsRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
   const testimonialsRef = useRef<HTMLDivElement>(null);
 
-  // Mock chart data for demo
-  const demoChartData = Array.from({ length: 30 }, (_, i) => ({
-    timestamp: Date.now() - (29 - i) * 300000,
-    open: 45000 + Math.random() * 3000,
-    high: 46000 + Math.random() * 3000,
-    low: 44000 + Math.random() * 2000,
-    close: 45000 + Math.random() * 3000,
-    volume: Math.random() * 1000000
-  }));
+  const mockChartData = [
+    { time: '9:00', price: 42000, volume: 1200 },
+    { time: '9:30', price: 42500, volume: 1800 },
+    { time: '10:00', price: 41800, volume: 2100 },
+    { time: '10:30', price: 43200, volume: 1600 },
+    { time: '11:00', price: 44100, volume: 2400 },
+    { time: '11:30', price: 43800, volume: 1900 },
+    { time: '12:00', price: 45200, volume: 2800 }
+  ];
+
+  const portfolioData = [
+    { month: 'Jan', value: 10000 },
+    { month: 'Feb', value: 12500 },
+    { month: 'Mar', value: 11800 },
+    { month: 'Apr', value: 15200 },
+    { month: 'May', value: 18700 },
+    { month: 'Jun', value: 22400 }
+  ];
 
   useEffect(() => {
-    // Create enhanced floating particles
-    if (particlesRef.current) {
-      for (let i = 0; i < 100; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.cssText = `
-          position: absolute;
-          width: ${Math.random() * 4 + 2}px;
-          height: ${Math.random() * 4 + 2}px;
-          background: radial-gradient(circle, rgba(16, 185, 129, 0.8) 0%, transparent 70%);
-          border-radius: 50%;
-          left: ${Math.random() * 100}%;
-          top: ${Math.random() * 100}%;
-          animation: float ${Math.random() * 20 + 15}s linear infinite;
-          animation-delay: ${Math.random() * 20}s;
-          pointer-events: none;
-          z-index: 1;
-        `;
-        particlesRef.current.appendChild(particle);
-      }
-    }
-
-    // Enhanced GSAP Animations with more dynamic effects
-    const masterTimeline = gsap.timeline();
-
-    // Hero animations with more sophisticated effects
-    masterTimeline
-      .from(heroRef.current?.querySelector('.hero-icon'), {
-        scale: 0,
-        rotation: -720,
-        duration: 2,
-        ease: "elastic.out(1, 0.3)",
-      })
-      .from(heroRef.current?.querySelector('.hero-title'), {
-        y: 150,
-        opacity: 0,
-        duration: 1.5,
-        ease: "power4.out"
-      }, "-=1.2")
-      .from(heroRef.current?.querySelector('.hero-subtitle'), {
-        y: 100,
-        opacity: 0,
-        duration: 1.2,
-        ease: "power3.out"
-      }, "-=0.8")
-      .from(heroRef.current?.querySelector('.hero-features'), {
-        y: 80,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out"
-      }, "-=0.6")
-      .from(heroRef.current?.querySelector('.hero-button'), {
-        scale: 0.3,
-        opacity: 0,
-        duration: 1.2,
-        ease: "elastic.out(1, 0.5)"
-      }, "-=0.4");
-
-    // Chart demo animation
-    gsap.from(chartDemoRef.current, {
+    const tl = gsap.timeline();
+    
+    tl.from(heroRef.current, {
+      opacity: 0,
       y: 100,
-      opacity: 0,
-      duration: 1.5,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: chartDemoRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    // Scroll-triggered animations
-    gsap.from(featuresRef.current?.children, {
-      y: 120,
-      opacity: 0,
       duration: 1.2,
-      stagger: 0.2,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: featuresRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    gsap.from(benefitsRef.current?.children, {
-      x: -120,
+      ease: "power3.out"
+    })
+    .from(featuresRef.current, {
       opacity: 0,
+      y: 60,
+      duration: 0.8,
+      ease: "power2.out"
+    }, "-=0.6")
+    .from(statsRef.current, {
+      opacity: 0,
+      scale: 0.8,
+      duration: 0.8,
+      ease: "back.out(1.7)"
+    }, "-=0.4");
+
+    // Animate benefits section
+    gsap.from(benefitsRef.current, {
+      opacity: 0,
+      x: -100,
       duration: 1,
-      stagger: 0.15,
       ease: "power3.out",
       scrollTrigger: {
         trigger: benefitsRef.current,
-        start: "top 75%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    gsap.from(testimonialsRef.current?.children, {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: "back.out(2)",
-      scrollTrigger: {
-        trigger: testimonialsRef.current,
         start: "top 80%",
         toggleActions: "play none none reverse"
       }
     });
 
-    gsap.from(pricingRef.current?.children, {
-      y: 100,
+    // Animate pricing section
+    gsap.from(pricingRef.current, {
       opacity: 0,
+      y: 80,
       duration: 1,
-      stagger: 0.15,
       ease: "power3.out",
       scrollTrigger: {
         trigger: pricingRef.current,
@@ -155,260 +84,333 @@ const LandingPage: React.FC<LandingPageProps> = ({ onAccessClick }) => {
         toggleActions: "play none none reverse"
       }
     });
-
-    gsap.from(statsRef.current?.children, {
-      scale: 0.3,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.1,
-      ease: "back.out(3)",
-      scrollTrigger: {
-        trigger: statsRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
-      }
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      if (particlesRef.current) {
-        particlesRef.current.innerHTML = '';
-      }
-    };
   }, []);
 
-  const testimonials = [
-    {
-      name: "Alex Chen",
-      role: "Professional Day Trader",
-      content: "Smart Journal transformed my trading. The WebSocket integration with live data and drawing tools helped me identify patterns I never noticed before. My win rate improved by 35%.",
-      avatar: "💼",
-      pnl: "+$45,230"
-    },
-    {
-      name: "Sarah Rodriguez", 
-      role: "Crypto Portfolio Manager",
-      content: "The real-time charts and professional analytics are incredible. The Go backend integration works flawlessly with multiple exchanges. This is the future of trading platforms.",
-      avatar: "🚀",
-      pnl: "+$127,890"
-    },
-    {
-      name: "Marcus Thompson",
-      role: "Algorithmic Trader",
-      content: "Best trading platform I've ever used. The WebSocket feeds are lightning fast, and the chart analysis tools are professional-grade. Revenue increased 3x since switching.",
-      avatar: "📈",
-      pnl: "+$89,450"
-    }
-  ];
-
   return (
-    <div className="min-h-screen trading-gradient relative overflow-hidden">
-      {/* Enhanced Floating Particles */}
-      <div ref={particlesRef} className="absolute inset-0 overflow-hidden"></div>
-      
-      {/* Hero Section with Enhanced Design */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 lg:px-8">
-        <div ref={heroRef} className="text-center max-w-8xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center justify-center mb-16 space-y-12 lg:space-y-0 lg:space-x-16">
-            <div className="hero-icon relative">
-              <Brain className="h-32 w-32 lg:h-48 lg:w-48 text-trading-mint drop-shadow-2xl animate-pulse" />
-              <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-3xl animate-pulse"></div>
-            </div>
-            
-            <div className="text-left">
-              <h1 className="hero-title text-7xl lg:text-[8rem] font-bold text-white leading-none">
-                Smart
-                <span className="block text-trading-mint bg-gradient-to-r from-trading-mint via-emerald-400 to-teal-300 bg-clip-text text-transparent glow-text">Journal</span>
-              </h1>
-              <div className="text-2xl lg:text-4xl text-gray-300 mt-6 font-light">
-                Professional Trading Intelligence Platform
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black text-white overflow-hidden">
+      {/* Hero Section */}
+      <div ref={heroRef} className="relative min-h-screen flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.1)_0%,transparent_50%)]" />
+        
+        <div className="container mx-auto text-center z-10">
+          <Badge className="mb-6 bg-gradient-to-r from-trading-mint to-green-400 text-black px-6 py-2 text-lg font-semibold">
+            Professional Trading Platform
+          </Badge>
           
-          <p className="hero-subtitle text-3xl lg:text-5xl text-gray-300 mb-12 leading-relaxed max-w-6xl mx-auto font-light">
-            Transform your trading with <span className="text-trading-mint font-semibold">AI-powered insights</span>, 
-            real-time WebSocket data feeds, professional chart analysis, and advanced risk management.
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-trading-mint to-blue-300 bg-clip-text text-transparent leading-tight">
+            Trade Smarter,
+            <br />
+            <span className="text-trading-mint">Profit Better</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Advanced trading platform with real-time analytics, risk management, and professional-grade tools 
+            to maximize your trading performance.
           </p>
-
-          {/* Feature Highlights */}
-          <div className="hero-features grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-16 max-w-6xl mx-auto">
-            <div className="glass-effect rounded-2xl p-6 lg:p-8 border border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-500">
-              <Activity className="h-12 w-12 lg:h-16 lg:w-16 text-trading-mint mx-auto mb-4" />
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">Live Data</h3>
-              <p className="text-gray-300 text-sm lg:text-base">Real-time WebSocket feeds from all major exchanges</p>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 lg:p-8 border border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-500">
-              <Palette className="h-12 w-12 lg:h-16 lg:w-16 text-trading-mint mx-auto mb-4" />
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">Pro Charts</h3>
-              <p className="text-gray-300 text-sm lg:text-base">TradingView-style charts with drawing tools</p>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 lg:p-8 border border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-500">
-              <Brain className="h-12 w-12 lg:h-16 lg:w-16 text-trading-mint mx-auto mb-4" />
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">AI Analytics</h3>
-              <p className="text-gray-300 text-sm lg:text-base">Machine learning pattern recognition</p>
-            </div>
-            
-            <div className="glass-effect rounded-2xl p-6 lg:p-8 border border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-500">
-              <Globe className="h-12 w-12 lg:h-16 lg:w-16 text-trading-mint mx-auto mb-4" />
-              <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">Multi-Exchange</h3>
-              <p className="text-gray-300 text-sm lg:text-base">Connect to Binance, Coinbase, FTX & more</p>
-            </div>
-          </div>
-
-          <div className="hero-button-container">
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
-              onClick={onAccessClick}
-              className="hero-button bg-gradient-to-r from-teal-600 via-trading-mint to-emerald-500 hover:from-emerald-600 hover:via-teal-500 hover:to-trading-mint transform transition-all duration-700 text-white font-bold px-20 lg:px-32 py-8 lg:py-12 text-2xl lg:text-3xl rounded-3xl shadow-2xl hover:shadow-trading-mint/50 relative overflow-hidden group border-2 border-trading-mint/60 hover:border-trading-mint hover:scale-110"
+              onClick={onGetStarted}
+              size="lg"
+              className="bg-gradient-to-r from-trading-mint to-green-400 hover:from-green-400 hover:to-trading-mint text-black font-bold px-8 py-4 text-lg hover:scale-105 transform transition-all duration-300 shadow-2xl"
             >
-              <span className="relative z-10 flex items-center">
-                <Zap className="h-8 w-8 lg:h-10 lg:w-10 mr-4 animate-pulse" />
-                Launch Smart Journal Pro
-                <Star className="h-8 w-8 lg:h-10 lg:w-10 ml-4 animate-spin" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <Rocket className="mr-2 h-5 w-5" />
+              Start Trading Now
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-2 border-trading-mint text-trading-mint hover:bg-trading-mint hover:text-black px-8 py-4 text-lg transition-all duration-300"
+            >
+              <Play className="mr-2 h-4 w-4" />
+              Watch Demo
             </Button>
           </div>
-        </div>
 
-        {/* Live Chart Demo Section */}
-        <div ref={chartDemoRef} className="relative z-10 py-24 px-4 lg:px-8">
-          <div className="max-w-8xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl lg:text-7xl font-bold text-white mb-8 glow-text">Live Trading Dashboard</h2>
-              <p className="text-2xl lg:text-3xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                Professional-grade charts with real-time data feeds and advanced drawing tools
-              </p>
-            </div>
-            
-            <div className="mb-16">
-              <TradingChart
-                symbol="BTC/USD"
-                data={demoChartData}
-                currentPrice={demoChartData[demoChartData.length - 1]?.close}
-                change={1234.50}
-                changePercent={2.8}
-                height={600}
-              />
-            </div>
+          {/* Live Chart Preview */}
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-gray-800/50 border-trading-mint/30 backdrop-blur-sm">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">BTC/USD</h3>
+                    <p className="text-trading-mint text-xl font-semibold">$45,200.00 <span className="text-green-400">+5.2%</span></p>
+                  </div>
+                  <Badge className="bg-green-500/20 text-green-400 px-4 py-2">LIVE</Badge>
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={mockChartData}>
+                    <defs>
+                      <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }}/>
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }}/>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1f2937', 
+                        border: '1px solid #10b981',
+                        borderRadius: '8px' 
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="price" 
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      fill="url(#priceGradient)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Feature Showcase */}
-      <div className="relative z-10 py-24 px-4 lg:px-8">
-        <div className="max-w-8xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl lg:text-7xl font-bold text-white mb-8 glow-text">Professional Trading Tools</h2>
-            <p className="text-2xl lg:text-3xl text-gray-300 max-w-5xl mx-auto leading-relaxed">
-              Everything you need for professional trading with seamless Go backend integration
+      {/* Features Section */}
+      <div ref={featuresRef} className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Professional <span className="text-trading-mint">Trading Tools</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Everything you need to trade like a professional, all in one powerful platform.
             </p>
           </div>
 
-          <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <Activity className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">WebSocket Feeds</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">Lightning-fast real-time data from multiple exchanges with your Go backend integration. Zero latency trading signals.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <Layers className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">Professional Charts</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">TradingView-style charts with advanced indicators, multiple timeframes, and professional drawing tools for technical analysis.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <PenTool className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">Drawing Tools</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">Professional Excalidraw integration with templates for support/resistance, trend lines, Fibonacci retracements, and pattern analysis.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <Brain className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">AI Analytics</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">Machine learning algorithms analyze your trading patterns, identify market opportunities, and provide actionable insights for performance optimization.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <Shield className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">Risk Management</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">Advanced risk controls, position sizing calculators, real-time portfolio monitoring, and automated alerts to protect your capital.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="trading-card border-trading-mint/50 hover:border-trading-mint transition-all duration-700 hover:scale-110 group cursor-pointer relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-trading-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <CardContent className="p-10 lg:p-12 text-center relative z-10">
-                <div className="mb-8 relative">
-                  <Globe className="h-20 w-20 lg:h-24 lg:w-24 text-trading-mint mx-auto group-hover:scale-125 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-trading-mint/40 rounded-full blur-2xl group-hover:bg-trading-mint/60 transition-all duration-500"></div>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">Multi-Exchange</h3>
-                <p className="text-gray-300 leading-relaxed text-lg lg:text-xl">Seamless integration with Binance, Coinbase Pro, Kraken, FTX, and more. Unified portfolio tracking across all your exchange accounts.</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <BarChart3 className="h-12 w-12 text-trading-mint" />,
+                title: "Advanced Charts",
+                description: "Professional-grade charting with 50+ technical indicators and drawing tools."
+              },
+              {
+                icon: <Shield className="h-12 w-12 text-trading-mint" />,
+                title: "Risk Management",
+                description: "Comprehensive risk controls with position sizing and automated stop-losses."
+              },
+              {
+                icon: <Zap className="h-12 w-12 text-trading-mint" />,
+                title: "Real-Time Data",
+                description: "Live market data from major exchanges with millisecond precision."
+              },
+              {
+                icon: <Target className="h-12 w-12 text-trading-mint" />,
+                title: "Portfolio Analytics",
+                description: "Deep insights into your performance with advanced analytics and reporting."
+              },
+              {
+                icon: <Users className="h-12 w-12 text-trading-mint" />,
+                title: "Social Trading",
+                description: "Follow successful traders and copy their strategies automatically."
+              },
+              {
+                icon: <Globe className="h-12 w-12 text-trading-mint" />,
+                title: "Multi-Exchange",
+                description: "Trade across multiple exchanges from a single, unified interface."
+              }
+            ].map((feature, index) => (
+              <Card key={index} className="bg-gray-800/50 border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-300 hover:transform hover:scale-105">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-6 flex justify-center">{feature.icon}</div>
+                  <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Testimonials Section */}
-      <div className="relative z-10 py-24 px-4 lg:px-8">
-        <div className="max-w-8xl mx-auto">
-          <h2 className="text-5xl lg:text-7xl font-bold text-white mb-6 text-center glow-text">Trusted by Professionals</h2>
-          <p className="text-2xl lg:text-3xl text-gray-300 text-center mb-20 max-w-5xl mx-auto leading-relaxed">
-            Join thousands of successful traders who use Smart Journal to optimize their performance and connect their Go backends
-          </p>
-          
-          <div ref={testimonialsRef} className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="trading-card border-trading-mint/30 hover:border-trading-mint/60 transition-all duration-500 hover:scale-105">
-                <CardContent className="p-10 lg:p-12">
-                  <div className="text-8xl mb-8 text-center">{testimonial.avatar}</div>
-                  <p className="text-gray-300 text-xl leading-relaxed mb-8 italic">"{testimonial.content}"</p>
-                  <div className="border-t border-trading-mint/20 pt-8">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-bold text-white text-xl">{testimonial.name}</div>
-                        <div className="text-trading-mint text-base">{testimonial.role}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-green-400">{testimonial.pnl}</div>
-                        <div className="text-sm text-gray-400">This year</div>
-                      </div>
-                    </div>
+      {/* Stats Section */}
+      <div ref={statsRef} className="py-20 px-4 bg-gray-800/30">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              { value: "50K+", label: "Active Traders" },
+              { value: "$2.5B", label: "Volume Traded" },
+              { value: "99.9%", label: "Uptime" },
+              { value: "24/7", label: "Support" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-trading-mint mb-2">{stat.value}</div>
+                <div className="text-gray-300 text-lg">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Benefits Section */}
+      <div ref={benefitsRef} className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-8">
+                Why Choose <span className="text-trading-mint">TradePro</span>?
+              </h2>
+              
+              <div className="space-y-6">
+                {[
+                  "Institutional-grade security with 256-bit encryption",
+                  "Lightning-fast execution with sub-millisecond latency",
+                  "Advanced order types including algorithmic strategies",
+                  "Comprehensive educational resources and tutorials",
+                  "24/7 customer support from trading experts"
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-center space-x-4">
+                    <CheckCircle className="h-6 w-6 text-trading-mint flex-shrink-0" />
+                    <span className="text-lg text-gray-300">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Card className="bg-gray-800/50 border-trading-mint/30">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">Portfolio Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={portfolioData}>
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }}/>
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }}/>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1f2937', 
+                          border: '1px solid #10b981',
+                          borderRadius: '8px' 
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#10b981" 
+                        strokeWidth={3}
+                        dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing Section */}
+      <div ref={pricingRef} className="py-20 px-4 bg-gray-800/30">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Choose Your <span className="text-trading-mint">Plan</span>
+            </h2>
+            <p className="text-xl text-gray-300">Start free, upgrade when you're ready to scale</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                name: "Starter",
+                price: "Free",
+                description: "Perfect for beginners",
+                features: ["Basic charting", "Portfolio tracking", "Community access", "Email support"]
+              },
+              {
+                name: "Pro",
+                price: "$29/mo",
+                description: "For serious traders",
+                features: ["Advanced charts", "Risk management", "API access", "Priority support"],
+                popular: true
+              },
+              {
+                name: "Enterprise",
+                price: "$99/mo",
+                description: "For trading firms",
+                features: ["All Pro features", "White-label solution", "Custom integrations", "Dedicated support"]
+              }
+            ].map((plan, index) => (
+              <Card key={index} className={`relative ${plan.popular ? 'border-trading-mint border-2 scale-105' : 'border-gray-600'} bg-gray-800/50`}>
+                {plan.popular && (
+                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-trading-mint text-black px-4 py-1">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-2xl font-bold mb-2 text-white">{plan.name}</h3>
+                  <div className="text-4xl font-bold text-trading-mint mb-2">{plan.price}</div>
+                  <p className="text-gray-300 mb-8">{plan.description}</p>
+                  
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center justify-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-trading-mint" />
+                        <span className="text-gray-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button 
+                    className={`w-full ${plan.popular ? 'bg-gradient-to-r from-trading-mint to-green-400 text-black' : 'border border-trading-mint text-trading-mint hover:bg-trading-mint hover:text-black'}`}
+                    variant={plan.popular ? "default" : "outline"}
+                  >
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div ref={testimonialsRef} className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              What <span className="text-trading-mint">Traders</span> Say
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Sarah Chen",
+                role: "Professional Trader",
+                content: "TradePro has revolutionized my trading. The risk management tools alone have saved me thousands.",
+                rating: 5
+              },
+              {
+                name: "Mike Rodriguez",
+                role: "Hedge Fund Manager",
+                content: "The best trading platform I've used. Lightning fast execution and incredible analytics.",
+                rating: 5
+              },
+              {
+                name: "Emily Johnson",
+                role: "Day Trader",
+                content: "Finally, a platform that understands what serious traders need. Highly recommended!",
+                rating: 5
+              }
+            ].map((testimonial, index) => (
+              <Card key={index} className="bg-gray-800/50 border-trading-mint/30">
+                <CardContent className="p-8">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-300 mb-6 italic">"{testimonial.content}"</p>
+                  <div>
+                    <div className="font-bold text-white">{testimonial.name}</div>
+                    <div className="text-trading-mint text-sm">{testimonial.role}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -417,59 +419,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onAccessClick }) => {
         </div>
       </div>
 
-      {/* Enhanced Stats Section */}
-      <div className="relative z-10 py-24 px-4 lg:px-8">
-        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10 max-w-8xl mx-auto">
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <DollarSign className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">95%</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">Win Rate</div>
-          </div>
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <Users className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">100K+</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">Active Traders</div>
-          </div>
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <Activity className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">5M+</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">Trades Tracked</div>
-          </div>
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <BookOpen className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">2M+</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">Journal Entries</div>
-          </div>
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <Globe className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">50+</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">Exchanges</div>
-          </div>
-          <div className="text-center glass-effect rounded-2xl p-8 lg:p-10 hover:scale-110 transition-transform duration-500 border border-trading-mint/30">
-            <Star className="h-16 w-16 lg:h-20 lg:w-20 text-trading-mint mx-auto mb-6 animate-pulse" />
-            <div className="text-4xl lg:text-5xl font-bold text-white">4.9/5</div>
-            <div className="text-gray-300 text-base lg:text-lg mt-2">User Rating</div>
-          </div>
+      {/* CTA Section */}
+      <div className="py-20 px-4 bg-gradient-to-r from-trading-mint/20 to-green-400/20">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Ready to Start <span className="text-trading-mint">Trading</span>?
+          </h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join thousands of successful traders who trust TradePro for their trading needs.
+          </p>
+          <Button 
+            onClick={onGetStarted}
+            size="lg"
+            className="bg-gradient-to-r from-trading-mint to-green-400 hover:from-green-400 hover:to-trading-mint text-black font-bold px-12 py-6 text-xl hover:scale-105 transform transition-all duration-300 shadow-2xl"
+          >
+            <Rocket className="mr-2 h-6 w-6" />
+            Start Your Trading Journey
+          </Button>
         </div>
-      </div>
-
-      {/* Final CTA Section */}
-      <div className="relative z-10 py-32 px-4 lg:px-8 text-center">
-        <h2 className="text-5xl lg:text-7xl font-bold text-white mb-12 glow-text">Ready to Transform Your Trading?</h2>
-        <p className="text-2xl lg:text-3xl text-gray-300 mb-16 max-w-6xl mx-auto leading-relaxed">
-          Join the elite community of professional traders who use Smart Journal with real-time WebSocket data, advanced AI analytics, and seamless Go backend integration.
-        </p>
-        <Button 
-          onClick={onAccessClick}
-          className="bg-gradient-to-r from-teal-600 via-trading-mint to-emerald-500 hover:from-emerald-600 hover:via-teal-500 hover:to-trading-mint transform transition-all duration-700 text-white font-bold px-24 lg:px-32 py-8 lg:py-12 text-2xl lg:text-3xl rounded-3xl shadow-2xl hover:shadow-trading-mint/50 border-2 border-trading-mint/60 hover:border-trading-mint hover:scale-110 relative overflow-hidden group"
-        >
-          <span className="relative z-10 flex items-center">
-            <Zap className="h-8 w-8 lg:h-10 lg:w-10 mr-4 animate-pulse" />
-            Start Your Professional Journey
-            <Award className="h-8 w-8 lg:h-10 lg:w-10 ml-4" />
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        </Button>
       </div>
     </div>
   );
