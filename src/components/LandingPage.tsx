@@ -59,31 +59,47 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       ease: "back.out(1.7)"
     }, "-=0.4");
 
-    // Animate benefits section
-    gsap.from(benefitsRef.current, {
-      opacity: 0,
-      x: -100,
-      duration: 1,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: benefitsRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
-      }
-    });
+    // Animate benefits section when it comes into view
+    if (benefitsRef.current) {
+      gsap.fromTo(benefitsRef.current, 
+        {
+          opacity: 0,
+          x: -100
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: benefitsRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }
 
-    // Animate pricing section
-    gsap.from(pricingRef.current, {
-      opacity: 0,
-      y: 80,
-      duration: 1,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: pricingRef.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
-      }
-    });
+    // Animate pricing section when it comes into view
+    if (pricingRef.current) {
+      gsap.fromTo(pricingRef.current,
+        {
+          opacity: 0,
+          y: 80
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: pricingRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }
   }, []);
 
   return (
